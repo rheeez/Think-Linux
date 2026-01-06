@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>사랑의이름으로 :: TTL.com</title>
+<style>
+body {
+    margin: 0;
+    padding: 20px;
+    background-color: #000000;
+    color: #ffffff;
+    font-family: "굴림", Gulim, monospace;
+    font-size: 16px;
+    line-height: 1.4;
+    /* 텍스트 선택 방지 */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    /* 드래그 방지 */
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+    /* 우클릭 메뉴 방지를 위한 추가 스타일 */
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.text {
+    white-space: pre-wrap;
+    /* 텍스트 선택 방지 강화 */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.cursor {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* 선택 영역 스타일 무력화 */
+::selection {
+    background: transparent;
+}
+::-moz-selection {
+    background: transparent;
+}
+</style>
+</head>
+<body>
+<div class="text" id="output"></div>
+
+<script>
+// 개발자 도구 감지 및 차단
+(function() {
+    let devtools = {
+        open: false,
+        orientation: null
+    };
+    
+    const threshold = 160;
+    
+    setInterval(function() {
+        if (window.outerHeight - window.innerHeight > threshold || 
+            window.outerWidth - window.innerWidth > threshold) {
+            if (!devtools.open) {
+                devtools.open = true;
+                // 개발자 도구가 열리면 페이지를 다른 곳으로 리디렉트하거나 경고
+                alert('개발자 도구 사용이 감지되었습니다.');
+                window.location.href = 'about:blank';
+            }
+        } else {
+            devtools.open = false;
+        }
+    }, 500);
+})();
+
+// 키보드 단축키 차단
+document.addEventListener('keydown', function(e) {
+    // F12 (개발자 도구)
+    if (e.keyCode === 123) {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Ctrl 조합키들
+    if (e.ctrlKey) {
+        // Ctrl+Shift+I (개발자 도구)
+        if (e.shiftKey && e.keyCode === 73) {
+            e.preventDefault();
+            return false;
+        }
+        // Ctrl+Shift+J (콘솔)
+        if (e.shiftKey && e.keyCode === 74) {
+            e.preventDefault();
+            return false;
+        }
+        // Ctrl+Shift+K (파이어폭스 콘솔)
+        if (e.shiftKey && e.keyCode === 75) {
+            e.preventDefault();
+            return false;
+        }
+        // Ctrl+U (소스 보기)
+        if (e.keyCode === 85) {
+            e.preventDefault();
+            return false;
+        }
+        // Ctrl+S (저장)
+        if (e.keyCode === 83) {
+            e.preventDefault();
+            return false;
+        }
+        // Ctrl+A (전체 선택)
+        if (e.keyCode === 65) {
+            e.preventDefault();
+            return false;
+        }
+        // Ctrl+C (복사)
+        if (e.keyCode === 67) {
+            e.preventDefault();
+            return false;
+        }
+        // Ctrl+V (붙여넣기)
+        if (e.keyCode === 86) {
+            e.preventDefault();
+            return false;
+        }
+        // Ctrl+X (잘라내기)
+        if (e.keyCode === 88) {
+            e.preventDefault();
+            return false;
+        }
+        // Ctrl+P (인쇄)
+        if (e.keyCode === 80) {
+            e.preventDefault();
+            return false;
+        }
+    }
+    
+    // Alt 조합키들
+    if (e.altKey) {
+        // Alt+Tab (작업 전환) - 완전히 막을 수는 없지만 시도
+        if (e.keyCode === 9) {
+            e.preventDefault();
+            return false;
+        }
+    }
+});
+
+// 우클릭 방지
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// 드래그 방지
+document.addEventListener('dragstart', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// 선택 방지
+document.addEventListener('selectstart', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// 복사 이벤트 차단
+document.addEventListener('copy', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// 잘라내기 이벤트 차단
+document.addEventListener('cut', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// 붙여넣기 이벤트 차단
+document.addEventListener('paste', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// 인쇄 방지
+window.addEventListener('beforeprint', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// 페이지 이탈 방지 (뒤로가기 등)
+window.addEventListener('beforeunload', function(e) {
+    e.preventDefault();
+    e.returnValue = '';
+    return '';
+});
+
+// 콘솔 메시지 가리기
+console.clear();
+console.log = function() {};
+console.warn = function() {};
+console.error = function() {};
+
+// 기존 스크립트 부분
+const output = document.getElementById('output');
+
+// CMD 시작 메시지들은 즉시 표시
+const initialText = `Microsoft Windows [Version 10.0.26100.4946]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\\>`;
+
+// 타이핑될 명령어
+const command = 'ping time.to.love';
+
+// ping 결과를 줄별로 분리
+const pingLines = [
+    '\n\nPing time.to.love 32바이트 데이터 사용:',
+    '\ntime.to.love의 응답: 바이트=32 시간=46ms TTL=114',
+    '\ntime.to.love의 응답: 바이트=32 시간=45ms TTL=114',
+    '\ntime.to.love의 응답: 바이트=32 시간=46ms TTL=114',
+    '\ntime.to.love의 응답: 바이트=32 시간=47ms TTL=114\n\ntime.to.love에 대한 Ping 통계:\n    패킷: 보냄 = 4, 받음 = 4, 손실 = 0 (0% 손실),\n왕복 시간(밀리초):\n    최소 = 45ms, 최대 = 47ms, 평균 = 46ms\n\nC:\\>'
+];
+
+let currentChar = 0;
+
+function typeCommand() {
+    if (currentChar < command.length) {
+        output.textContent += command[currentChar];
+        currentChar++;
+        setTimeout(typeCommand, Math.random() * 100 + 50);
+    } else {
+        // 타이핑 완료 후 깜빡이는 커서 추가
+        const cursor = document.createElement('span');
+        cursor.className = 'cursor';
+        cursor.textContent = '_';
+        output.appendChild(cursor);
+        
+        // 5번 깜빡인 후 ping 결과 표시 (5초)
+        setTimeout(showPingResult, 5000);
+    }
+}
+
+function showPingResult() {
+    // 커서 제거
+    const cursor = output.querySelector('.cursor');
+    if (cursor) {
+        cursor.remove();
+    }
+    
+    let currentLine = 0;
+    
+    function showNextLine() {
+        if (currentLine < pingLines.length) {
+            output.textContent += pingLines[currentLine];
+            currentLine++;
+            
+            // 첫 번째 줄(헤더)은 즉시, 나머지는 1초씩 간격
+            if (currentLine === 1) {
+                setTimeout(showNextLine, 100); // 헤더 후 바로
+            } else if (currentLine < pingLines.length) {
+                setTimeout(showNextLine, 1000); // 1초 간격
+            }
+        }
+        
+        // 마지막 줄까지 완료되면 커서 추가
+        if (currentLine === pingLines.length) {
+            const finalCursor = document.createElement('span');
+            finalCursor.className = 'cursor';
+            finalCursor.textContent = '_';
+            output.appendChild(finalCursor);
+        }
+    }
+    
+    showNextLine();
+}
+
+// 페이지 로드 시 즉시 초기 텍스트 표시
+output.textContent = initialText;
+
+// 1초 후 명령어 타이핑 시작
+setTimeout(typeCommand, 1000);
+</script>
+</body>
+</html>
